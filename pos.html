@@ -45,10 +45,14 @@
   </main>
 
   <script>
-    const THEME_KEY = "inventory_theme";
     (function() {
-      const saved = localStorage.getItem(THEME_KEY) || "dark";
+      const key = "inventory_theme";
+      const saved = localStorage.getItem(key) || "dark";
       document.documentElement.setAttribute("data-theme", saved);
+      document.addEventListener("DOMContentLoaded", function() {
+        const btn = document.getElementById("theme-toggle");
+        if (btn) btn.textContent = saved === "light" ? "\u2600" : "\u263E";
+      });
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
