@@ -33,7 +33,6 @@ function toggleTheme() {
 
 (function initTheme() {
   const saved = localStorage.getItem(THEME_KEY) || "dark";
-  document.documentElement.setAttribute("data-theme", saved);
   themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
 })();
 
