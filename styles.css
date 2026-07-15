@@ -50,21 +50,8 @@ tr:hover td{background:var(--row-hover)}
 .empty{text-align:center;color:var(--muted);padding:3rem 1rem;display:none}
 .low-stock{color:var(--danger);font-weight:600}
 
-@media(max-width:768px){
-  nav{padding:0}
-  .nav-inner{padding:.75rem 1rem;flex-wrap:wrap;gap:.5rem}
-  .stats{font-size:.75rem;width:100%;order:3;text-align:center}
-  main{padding:1rem}
-  #form-section,#table-section{padding:1.25rem}
-  h2{font-size:1.2rem}
-  .form-grid{grid-template-columns:1fr}
-  .form-actions{flex-direction:column}
-  .form-actions .btn{width:100%}
+@media(max-width:600px){
   .table-header{flex-direction:column;align-items:stretch}
   #search{width:100%}
-  table{font-size:.8rem}
-  th,td{padding:.5rem .35rem;white-space:nowrap}
-  .actions{flex-direction:column;gap:.25rem}
-  .actions .btn{font-size:.7rem;padding:.3rem .5rem;text-align:center}
-  .stats{font-size:.7rem}
+  .form-grid{grid-template-columns:1fr}
 }
