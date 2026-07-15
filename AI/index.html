@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Manager</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <span class="logo">Inventory Manager</span>
+      <div class="nav-right">
+        <span class="stats" id="stats">0 items &middot; $0.00 total value</span>
+        <a href="pos.html" class="nav-link">POS</a>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">&#9790;</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section id="form-section">
+      <h2 id="form-title">Add Product</h2>
+      <form id="product-form">
+        <input type="hidden" id="edit-id" />
+        <div class="form-grid">
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" required placeholder="e.g. Wireless Mouse" />
+          </div>
+          <div class="field">
+            <label for="category">Category</label>
+            <input type="text" id="category" required placeholder="e.g. Electronics" />
+          </div>
+          <div class="field">
+            <label for="price">Price (&#8369;)</label>
+            <input type="number" id="price" step="0.01" min="0" required placeholder="0.00" />
+          </div>
+          <div class="field">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" min="0" required placeholder="0" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn" id="submit-btn">Add Product</button>
+          <button type="button" class="btn btn-secondary" id="cancel-btn" hidden>Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="table-section">
+      <div class="table-header">
+        <h2>Products</h2>
+        <input type="text" id="search" placeholder="Search products..." />
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="product-list"></tbody>
+        </table>
+        <p class="empty" id="empty-msg">No products yet. Add one above!</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
