@@ -1,5 +1,9 @@
-const STORAGE_KEY = "inventory_products";
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
 const THEME_KEY = "inventory_theme";
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const themeToggle = document.getElementById("theme-toggle");
 const searchInput = document.getElementById("search");
 const productGrid = document.getElementById("product-grid");
@@ -14,18 +18,6 @@ const clearBtn = document.getElementById("clear-btn");
 
 let products = [];
 let cart = [];
-
-function loadProducts() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveProducts() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-}
 
 themeToggle.addEventListener("click", toggleTheme);
 searchInput.addEventListener("input", renderProducts);
@@ -46,16 +38,21 @@ function toggleTheme() {
   themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
 })();
 
-function renderProducts() {
-  products = loadProducts();
+window.addEventListener("pageshow", () => {
+  renderProducts();
+  renderCart();
+});
+
+async function renderProducts() {
   const query = searchInput.value.toLowerCase();
-  const filtered = products.filter(
-    (p) => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)
-  );
-
+  let supabaseQuery = supabase.from("products").select("*").order("name", { ascending: true });
+  if (query) {
+    supabaseQuery = supabaseQuery.or(`name.ilike.%${query}%,category.ilike.%${query}%`);
+  }
+  const { data } = await supabaseQuery;
+  products = data || [];
   productGrid.innerHTML = "";
-
-  filtered.forEach((p) => {
+  products.forEach((p) => {
     const div = document.createElement("div");
     const outOfStock = p.quantity <= 0;
     div.className = "product-card" + (outOfStock ? " out-of-stock" : "");
@@ -70,23 +67,17 @@ function renderProducts() {
     }
     productGrid.appendChild(div);
   });
-
-  emptyProducts.style.display = filtered.length === 0 ? "block" : "none";
+  emptyProducts.style.display = products.length === 0 ? "block" : "none";
 }
 
 function addToCart(product) {
   const existing = cart.find((c) => c.id === product.id);
   const productData = products.find((p) => p.id === product.id);
   const maxQty = productData ? productData.quantity : 0;
-
   if (existing) {
-    if (existing.qty < maxQty) {
-      existing.qty++;
-    }
+    if (existing.qty < maxQty) existing.qty++;
   } else {
-    if (maxQty > 0) {
-      cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
-    }
+    if (maxQty > 0) cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
   }
   renderCart();
 }
@@ -112,7 +103,6 @@ function clearCart() {
 
 function renderCart() {
   cartItems.innerHTML = "";
-
   cart.forEach((item) => {
     const div = document.createElement("div");
     div.className = "cart-item";
@@ -132,39 +122,31 @@ function renderCart() {
     `;
     cartItems.appendChild(div);
   });
-
   cartItems.querySelectorAll(".qty-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      changeQty(btn.dataset.id, parseInt(btn.dataset.dir, 10));
-    });
+    btn.addEventListener("click", () => changeQty(btn.dataset.id, parseInt(btn.dataset.dir, 10)));
   });
-
   cartItems.querySelectorAll(".cart-item-remove").forEach((btn) => {
     btn.addEventListener("click", () => removeFromCart(btn.dataset.id));
   });
-
   const hasItems = cart.length > 0;
   emptyCart.style.display = hasItems ? "none" : "block";
   cartFooter.hidden = !hasItems;
-
   const totalQty = cart.reduce((s, c) => s + c.qty, 0);
   const totalVal = cart.reduce((s, c) => s + c.price * c.qty, 0);
   cartCount.textContent = totalQty;
   cartTotal.textContent = "\u20B1" + totalVal.toFixed(2);
 }
 
-function completeSale() {
+async function completeSale() {
   if (cart.length === 0) return;
   if (!confirm("Complete this sale?")) return;
-
-  cart.forEach((item) => {
-    const product = products.find((p) => p.id === item.id);
-    if (product) {
-      product.quantity = Math.max(0, product.quantity - item.qty);
+  for (const item of cart) {
+    const productData = products.find((p) => p.id === item.id);
+    if (productData) {
+      const newQty = Math.max(0, productData.quantity - item.qty);
+      await supabase.from("products").update({ quantity: newQty }).eq("id", item.id);
     }
-  });
-
-  saveProducts();
+  }
   cart = [];
   renderCart();
   renderProducts();
@@ -176,11 +158,6 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
-
-window.addEventListener("pageshow", () => {
-  renderProducts();
-  renderCart();
-});
 
 renderProducts();
 renderCart();

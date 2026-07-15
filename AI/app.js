@@ -1,4 +1,9 @@
-const STORAGE_KEY = "inventory_products";
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
+const THEME_KEY = "inventory_theme";
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const form = document.getElementById("product-form");
 const nameInput = document.getElementById("name");
 const categoryInput = document.getElementById("category");
@@ -12,16 +17,12 @@ const productList = document.getElementById("product-list");
 const emptyMsg = document.getElementById("empty-msg");
 const searchInput = document.getElementById("search");
 const statsEl = document.getElementById("stats");
-
-const THEME_KEY = "inventory_theme";
 const themeToggle = document.getElementById("theme-toggle");
 
-let products = loadProducts();
-
+themeToggle.addEventListener("click", toggleTheme);
 form.addEventListener("submit", handleSubmit);
 cancelBtn.addEventListener("click", cancelEdit);
 searchInput.addEventListener("input", renderProducts);
-themeToggle.addEventListener("click", toggleTheme);
 
 function toggleTheme() {
   const html = document.documentElement;
@@ -37,47 +38,28 @@ function toggleTheme() {
   themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
 })();
 
-function loadProducts() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
+window.addEventListener("pageshow", renderProducts);
 
-function saveProducts() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-}
-
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault();
-  const editId = editIdInput.value;
-  const product = {
-    id: editId || generateId(),
+  const data = {
     name: nameInput.value.trim(),
     category: categoryInput.value.trim(),
     price: parseFloat(priceInput.value),
     quantity: parseInt(quantityInput.value, 10),
   };
-
+  const editId = editIdInput.value;
   if (editId) {
-    const idx = products.findIndex((p) => p.id === editId);
-    if (idx !== -1) products[idx] = product;
+    await supabase.from("products").update(data).eq("id", editId);
   } else {
-    products.push(product);
+    await supabase.from("products").insert(data);
   }
-
-  saveProducts();
-  renderProducts();
   form.reset();
   editIdInput.value = "";
   formTitle.textContent = "Add Product";
   submitBtn.textContent = "Add Product";
   cancelBtn.hidden = true;
+  renderProducts();
 }
 
 function cancelEdit() {
@@ -88,38 +70,36 @@ function cancelEdit() {
   cancelBtn.hidden = true;
 }
 
-function editProduct(id) {
-  const p = products.find((x) => x.id === id);
-  if (!p) return;
-  editIdInput.value = p.id;
-  nameInput.value = p.name;
-  categoryInput.value = p.category;
-  priceInput.value = p.price;
-  quantityInput.value = p.quantity;
+async function editProduct(id) {
+  const { data } = await supabase.from("products").select("*").eq("id", id).single();
+  if (!data) return;
+  editIdInput.value = data.id;
+  nameInput.value = data.name;
+  categoryInput.value = data.category;
+  priceInput.value = data.price;
+  quantityInput.value = data.quantity;
   formTitle.textContent = "Edit Product";
   submitBtn.textContent = "Update Product";
   cancelBtn.hidden = false;
   nameInput.focus();
 }
 
-function deleteProduct(id) {
+async function deleteProduct(id) {
   if (!confirm("Delete this product?")) return;
-  products = products.filter((p) => p.id !== id);
-  saveProducts();
+  await supabase.from("products").delete().eq("id", id);
   renderProducts();
 }
 
-function renderProducts() {
+async function renderProducts() {
   const query = searchInput.value.toLowerCase();
-  const filtered = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(query) ||
-      p.category.toLowerCase().includes(query)
-  );
-
+  let supabaseQuery = supabase.from("products").select("*").order("created_at", { ascending: false });
+  if (query) {
+    supabaseQuery = supabaseQuery.or(`name.ilike.%${query}%,category.ilike.%${query}%`);
+  }
+  const { data: products } = await supabaseQuery;
   productList.innerHTML = "";
-
-  filtered.forEach((p) => {
+  if (!products) return;
+  products.forEach((p) => {
     const tr = document.createElement("tr");
     const total = (p.price * p.quantity).toFixed(2);
     const qtyClass = p.quantity < 5 ? "low-stock" : "";
@@ -136,9 +116,7 @@ function renderProducts() {
     `;
     productList.appendChild(tr);
   });
-
-  emptyMsg.style.display = filtered.length === 0 ? "block" : "none";
-
+  emptyMsg.style.display = products.length === 0 ? "block" : "none";
   const totalItems = products.reduce((s, p) => s + p.quantity, 0);
   const totalValue = products.reduce((s, p) => s + p.price * p.quantity, 0);
   statsEl.textContent = `${products.length} item types \u00B7 ${totalItems} units \u00B1${totalValue.toFixed(2)} total value`;
