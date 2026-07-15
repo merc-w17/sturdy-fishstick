@@ -1,6 +1,6 @@
-const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu._supabase.co";
 const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window._supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const form = document.getElementById("product-form");
 const nameInput = document.getElementById("name");
@@ -49,9 +49,9 @@ async function handleSubmit(e) {
   };
   const editId = editIdInput.value;
   if (editId) {
-    await supabase.from("products").update(data).eq("id", editId);
+    await _supabase.from("products").update(data).eq("id", editId);
   } else {
-    await supabase.from("products").insert([data]);
+    await _supabase.from("products").insert([data]);
   }
   form.reset();
   editIdInput.value = "";
@@ -70,7 +70,7 @@ function cancelEdit() {
 }
 
 async function editProduct(id) {
-  const { data } = await supabase.from("products").select("*").eq("id", id).single();
+  const { data } = await _supabase.from("products").select("*").eq("id", id).single();
   if (!data) return;
   editIdInput.value = data.id;
   nameInput.value = data.name;
@@ -85,13 +85,13 @@ async function editProduct(id) {
 
 async function deleteProduct(id) {
   if (!confirm("Delete this product?")) return;
-  await supabase.from("products").delete().eq("id", id);
+  await _supabase.from("products").delete().eq("id", id);
   renderProducts();
 }
 
 async function renderProducts() {
   const query = searchInput.value.toLowerCase();
-  let supabaseQuery = supabase.from("products").select("*").order("created_at", { ascending: false });
+  let supabaseQuery = _supabase.from("products").select("*").order("created_at", { ascending: false });
   if (query) {
     supabaseQuery = supabaseQuery.or("name.ilike.%{query}%,category.ilike.%{query}%".replace(/{query}/g, query));
   }
