@@ -1,6 +1,6 @@
-const SUPABASE_URL = "https://vbplazrbewalokmwtzhu._supabase.co";
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
 const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
-const _supabase = window._supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const THEME_KEY = "inventory_theme";
 const themeToggle = document.getElementById("theme-toggle");
