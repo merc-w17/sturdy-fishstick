@@ -1,3 +1,13 @@
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
+let supabase;
+
+try {
+  supabase = supabase_js.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch (e) {
+  console.warn("Supabase init error:", e);
+}
+
 const THEME_KEY = "inventory_theme";
 const themeToggle = document.getElementById("theme-toggle");
 
@@ -5,6 +15,7 @@ themeToggle.addEventListener("click", toggleTheme);
 
 (function initTheme() {
   const saved = localStorage.getItem(THEME_KEY) || "dark";
+  document.documentElement.setAttribute("data-theme", saved);
   themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
 })();
 
@@ -15,11 +26,6 @@ function toggleTheme() {
   themeToggle.textContent = isLight ? "\u263E" : "\u2600";
   localStorage.setItem(THEME_KEY, isLight ? "dark" : "light");
 }
-
-const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
-const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
-
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const searchInput = document.getElementById("search");
 const productGrid = document.getElementById("product-grid");
