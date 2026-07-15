@@ -1,6 +1,6 @@
-const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
+const SUPABASE_URL = "https://vbplazrbewalokmwtzhu._supabase.co";
 const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window._supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const THEME_KEY = "inventory_theme";
 const themeToggle = document.getElementById("theme-toggle");
@@ -43,7 +43,7 @@ window.addEventListener("pageshow", () => {
 
 async function renderProducts() {
   const query = searchInput.value.toLowerCase();
-  let supabaseQuery = supabase.from("products").select("*").order("name", { ascending: true });
+  let supabaseQuery = _supabase.from("products").select("*").order("name", { ascending: true });
   if (query) {
     supabaseQuery = supabaseQuery.or("name.ilike.%{query}%,category.ilike.%{query}%".replace(/{query}/g, query));
   }
@@ -142,7 +142,7 @@ async function completeSale() {
     const productData = products.find((p) => p.id === item.id);
     if (productData) {
       const newQty = Math.max(0, productData.quantity - item.qty);
-      await supabase.from("products").update({ quantity: newQty }).eq("id", item.id);
+      await _supabase.from("products").update({ quantity: newQty }).eq("id", item.id);
     }
   }
   cart = [];
