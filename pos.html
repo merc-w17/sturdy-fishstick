@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Point of Sale</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="pos.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" class="logo">POS</a>
+      <div class="nav-right">
+        <a href="index.html" class="nav-link">Inventory</a>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">&#9790;</button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section id="products-panel">
+      <div class="panel-header">
+        <h2>Products</h2>
+        <input type="text" id="search" placeholder="Search products..." />
+      </div>
+      <div class="product-grid" id="product-grid"></div>
+      <p class="empty" id="empty-products">No products in inventory. Add some in the Inventory manager.</p>
+    </section>
+
+    <section id="cart-panel">
+      <h2>Cart</h2>
+      <div class="cart-items" id="cart-items"></div>
+      <p class="empty" id="empty-cart">Cart is empty. Click a product to add it.</p>
+      <div class="cart-footer" id="cart-footer" hidden>
+        <div class="cart-row"><span>Items</span><span id="cart-count">0</span></div>
+        <div class="cart-row cart-total"><span>Total</span><span id="cart-total">$0.00</span></div>
+        <button class="btn btn-primary" id="complete-btn">Complete Sale</button>
+        <button class="btn btn-secondary" id="clear-btn">Clear Cart</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="pos.js"></script>
+</body>
+</html>
