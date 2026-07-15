@@ -8,6 +8,12 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <link rel="stylesheet" href="pos.css" />
+  <script>
+    (function(){
+      var saved = localStorage.getItem("inventory_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", saved);
+    })();
+  </script>
 </head>
 <body>
 
