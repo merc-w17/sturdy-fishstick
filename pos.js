@@ -1,10 +1,27 @@
+const THEME_KEY = "inventory_theme";
+const themeToggle = document.getElementById("theme-toggle");
+
+themeToggle.addEventListener("click", toggleTheme);
+
+(function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || "dark";
+  document.documentElement.setAttribute("data-theme", saved);
+  themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
+})();
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.getAttribute("data-theme") === "light";
+  html.setAttribute("data-theme", isLight ? "dark" : "light");
+  themeToggle.textContent = isLight ? "\u263E" : "\u2600";
+  localStorage.setItem(THEME_KEY, isLight ? "dark" : "light");
+}
+
 const SUPABASE_URL = "https://vbplazrbewalokmwtzhu.supabase.co";
 const SUPABASE_KEY = "sb_publishable_56EGwF-4b_R128n9hvRy1Q_ioVbBVes";
-const THEME_KEY = "inventory_theme";
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const themeToggle = document.getElementById("theme-toggle");
 const searchInput = document.getElementById("search");
 const productGrid = document.getElementById("product-grid");
 const emptyProducts = document.getElementById("empty-products");
@@ -19,24 +36,9 @@ const clearBtn = document.getElementById("clear-btn");
 let products = [];
 let cart = [];
 
-themeToggle.addEventListener("click", toggleTheme);
 searchInput.addEventListener("input", renderProducts);
 completeBtn.addEventListener("click", completeSale);
 clearBtn.addEventListener("click", clearCart);
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const isLight = html.getAttribute("data-theme") === "light";
-  html.setAttribute("data-theme", isLight ? "dark" : "light");
-  themeToggle.textContent = isLight ? "\u263E" : "\u2600";
-  localStorage.setItem(THEME_KEY, isLight ? "dark" : "light");
-}
-
-(function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || "dark";
-  document.documentElement.setAttribute("data-theme", saved);
-  themeToggle.textContent = saved === "light" ? "\u2600" : "\u263E";
-})();
 
 window.addEventListener("pageshow", () => {
   renderProducts();
